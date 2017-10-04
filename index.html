@@ -1,0 +1,161 @@
+<html>
+<style>
+.container{
+  width: 100%;
+  max-width: 800px;
+  margin: 100px auto;
+}
+form {
+}
+form input {
+  display: block;
+  box-sizing: border-box;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: none;
+  background: #ebebeb;
+  border-radius: 0;
+  outline: none;
+}
+.CodeMirror{
+  border: 1px solid #ebebeb;
+}
+form input[type=submit] {
+  background: yellowgreen;
+  display: block;
+  font-family: "Helvetica Neue", helvetica, arial;
+  color: white;
+  width: 100%;
+  margin: 10px;
+}
+h5 {
+  padding: 10px 0 0 0;
+  margin: 10px 0 5px;
+  font-family: verdana;
+  font-weight: normal;
+}
+#response {
+  background: #222;
+  font-size: 12px;
+  color: #ebebeb;
+  padding: 10px;
+  line-height: 12px;
+  box-sizing: border-box;
+}
+</style>
+<script src="https://www.celljs.org/cell.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css" rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.css" rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/theme/neo.css' rel='stylesheet'>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.js"></script>
+<script src='https://tojson.co/node_modules/jsonlint/lib/jsonlint.js'></script>
+<script src='https://tojson.co/node_modules/codemirror/addon/lint/lint.js'></script>
+<script src='https://tojson.co/node_modules/codemirror/addon/lint/javascript-lint.js'></script>
+<script src='https://tojson.co/node_modules/codemirror/addon/lint/json-lint.js'></script>
+<script src='https://tojson.co/node_modules/codemirror/addon/edit/closebrackets.js'></script>
+<script src='https://tojson.co/node_modules/codemirror/addon/edit/matchbrackets.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/mode/javascript/javascript.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css" rel="stylesheet">
+<script>
+Form = {
+  $cell: true,
+  class: "container",
+  $components: [{
+    $type: "h1",
+    $text: "JSONQL"
+  }, {
+    $text: "Send a JSON query to the server and receive the result, whichever way you want",
+    style: {
+      padding: "0 0 10px 0",
+      fontSize: "12px"
+    }
+  }, {
+    $text: "Note: The query is happening on the server-side",
+    style: {
+      padding: "0 0 10px 0",
+      fontSize: "12px"
+    }
+  }, {
+    $type: "form",
+    method: "post",
+    _endpoint: "/query",
+    _payload: null,
+    style: {
+      fontFamily: "Monaco, Menlo"
+    },
+    onsubmit: function() {
+      var self = this;
+      this.querySelector("#response").value = "Making a request...";
+      fetch(this._endpoint, {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(self._payload)
+      })
+      .then(function(res) {
+        return res.json();
+      })
+      .then(function(res) {
+        document.querySelector("#response").value = JSON.stringify(res, null, 2);
+      })
+      return false;
+    },
+    $components: [{
+      class: "row",
+      $components: [{
+        $type: "textarea",
+        name: "payload",
+        $init: function(){
+          var self = this;
+          this._ed = CodeMirror.fromTextArea(this, {
+            mode: "application/json",
+            lineNumbers: true,
+            lineWrapping: true,
+            lint: true,
+            styleActiveLine: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            viewportMargin: true,
+            theme: "neo",
+            gutters: ["CodeMirror-lint-markers"]
+          })
+          this._ed.setSize(null, 500);
+          var wrapper = this._ed.getWrapperElement()
+          wrapper.setAttribute("class", wrapper.getAttribute("class") + " col")
+          this._ed.on('change', function() {
+            self._payload = JSON.parse(self._ed.getValue());
+          })
+          self._payload = JSON.parse(self.value);
+        },
+        value: JSON.stringify({
+          "users": {
+            "{{#each users}}": {
+              "id": "{{user_id}}",
+              "post": {
+                "title": "{{title}}",
+                "content": "{{content}}"
+              }
+            }
+          }
+        }, null, 2)
+      }, {
+        $type: "textarea",
+        id: "response",
+        class: "col",
+        placeholder: "Construct a JSONQL above and submit to see the result here"
+      }]
+    }, {
+      class: "row",
+      $components: [{
+        $type: "input",
+        class: "btn submit",
+        type: "submit"
+      }]
+    }]
+  }]
+}
+</script>
+</html>
