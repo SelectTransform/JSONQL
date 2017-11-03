@@ -110,7 +110,7 @@ In this example we use a simple `express.js` server to listen to `POST` request
 ```
 app.post('/query', function(req, res){
   let jsonql = req.body;
-  let response = JSON.select(jsonql)
+  let response = ST.select(jsonql)
                     .transform(db)
                     .root();
   res.json(response);

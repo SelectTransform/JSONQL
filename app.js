@@ -1,7 +1,7 @@
 // Send a request as JSON template, and receive the result
 const express = require('express')
 const bodyParser = require('body-parser')
-require('stjs')
+const ST = require('stjs')
 const app = express()
 const chalk = require('chalk');
 const db = {
@@ -26,7 +26,7 @@ app.use(function(req, res, next) {
 app.post('/query', function(req, res){
   let jsonql = req.body;
   console.log(chalk.yellow("####################\n> Request: "), JSON.stringify(jsonql, null, 2));
-  let response = JSON.select(jsonql)
+  let response = ST.select(jsonql)
                     .transform(db)
                     .root();
 

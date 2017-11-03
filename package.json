@@ -9,9 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.18.1",
-    "chalk": "^2.1.0",
-    "express": "^4.15.4",
-    "stjs": "0.0.3"
+    "body-parser": "^1.18.2",
+    "chalk": "^2.3.0",
+    "express": "^4.16.2",
+    "stjs": "0.0.4"
   }
 }
